@@ -4,7 +4,6 @@
  */
 package communications;
 
-import java.util.Arrays;
 import fr.dgac.ivy.Ivy;
 import fr.dgac.ivy.IvyClient;
 import fr.dgac.ivy.IvyException;
@@ -17,28 +16,83 @@ import java.util.logging.Logger;
  * @author mateu
  */
 public class AirborneComms {
+    private AirborneTranslator translator;
     private Ivy bus;
+    private int flightID;
     
     public AirborneComms() throws IvyException {
         // initialize (set up the bus, name and ready message)
         bus = new Ivy("AirborneConnection", "GetNewFlight MsgName=NewF", null);
+        
+        // Initialize the flight
         bus.bindMsg("^NewFlight NewF NewID=(.*)", new IvyMessageListener() {
             // callback
             @Override
             public void receive(IvyClient client, String[] strings) {
-                String flightNb = strings[0];
-                String fpMessage = "SetMiniPln Flight=" + flightNb + " CallSign=AF123KQ Speed=300 Ssr=4732 Dep=LFBO Arr=LFPG";
+                flightID = Integer.parseInt(strings[0]);
+                translator = new AirborneTranslator(flightID);
+                System.out.println(flightID);
+                String fpMessage = "SetMiniPln Flight=" + flightID + " CallSign=AF123KQ Speed=300 Ssr=4732 Dep=LFBO Arr=LFPG";
                 try {
-                    bus.sendMsg("a");
+                    bus.sendMsg(fpMessage);
+                    flight();
+                } catch (IvyException ex) {
+                    Logger.getLogger(AirborneComms.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+        });
+
+        // start the bus on the default domain
+        bus.start("127.255.255.255:2010");
+    }
+    
+    public void flight() throws IvyException{
+        
+        // Listen for movement reports 
+        bus.bindMsg("^TrackMovedEvent Flight="+flightID+" CallSign=(.*) Ssr=(.*) "
+                + "Sector=(.*) Layers=(.*) X=(.*) Y=(.*) Vx=(.*) Vy=(.*) Afl=(.*) "
+                + "Rate=(.*) Heading=(.*) GroundSpeed=(.*) Tendency=(.*) Time=(.*)", 
+                new IvyMessageListener() {
+            // callback
+            @Override
+            public void receive(IvyClient client, String[] strings) {
+                try {
+                    bus.sendMsg(translator.rejeuToAAR(strings));
                 } catch (IvyException ex) {
                     Logger.getLogger(AirborneComms.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
         
-        // start the bus on the default domain
-        //bus.start(null);
-        bus.start("127.255.255.255:2010");
+        // Listen for APDLC commands
+        bus.bindMsg("^UM(.*) (.*)", 
+                new IvyMessageListener() {
+            // callback
+            @Override
+            public void receive(IvyClient client, String[] strings) {
+                try {
+                    bus.sendMsg(translator.apdlcToRejeu(strings));
+                } catch (IvyException ex) {
+                    Logger.getLogger(AirborneComms.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        
+        // Listen for acknowledgement from Rejeu
+        bus.bindMsg("^ReportEvent (.*) Result=(.*) Info=(.*)", 
+                new IvyMessageListener() {
+            // callback
+            @Override
+            public void receive(IvyClient client, String[] strings) {
+                try {
+                    bus.sendMsg(translator.acknowledge(strings[1]));
+                } catch (IvyException ex) {
+                    Logger.getLogger(AirborneComms.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        
     }
     
     public void stop(){
