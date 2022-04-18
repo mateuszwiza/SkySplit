@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package skysplit;
+package ground;
 
+import airborne.AirborneComms;
 import java.util.Arrays;
 import fr.dgac.ivy.Ivy;
 import fr.dgac.ivy.IvyClient;
@@ -94,7 +95,7 @@ public class GroundComms {
                 try {
                     bus.sendMsg(trafficStatus.toString());
                 } catch (IvyException ex) {
-                    Logger.getLogger(AirborneComms.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(GroundComms.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
@@ -103,6 +104,14 @@ public class GroundComms {
         
         //bus.start(null);
         bus.start("127.255.255.255:2010");
+    }
+    
+    public void sendToAirborne(String message){
+        try {
+            bus.sendMsg(message);
+        } catch (IvyException ex) {
+            Logger.getLogger(GroundComms.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public static void main(String[] args) throws IvyException {
