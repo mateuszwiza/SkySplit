@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 public class GroundComms {
     
     private Ivy bus;
+    private SelfTrafficStatus currentStatus;
     
     public GroundComms() throws IvyException {
         bus = new Ivy("A-G-Connection", "GetNewFlight MsgName=NewF", null);
@@ -38,6 +39,7 @@ public class GroundComms {
                 else if(arrayACK[1] == "STANDBY")message = "A response will be delivered shortly.";
                 
                 try {
+                    System.out.println(message);
                     bus.sendMsg(message);
                 }catch (IvyException ex){
                     Logger.getLogger(GroundComms.class.getName()).log(Level.SEVERE, null, ex);
@@ -66,6 +68,12 @@ public class GroundComms {
                     }
                     
                     String statusValue = arrayReceived[i].substring(arrayReceived[i].indexOf("=") + 1);
+                    
+                    //example for change in flight current status to be sent to GUI
+                    if(flightOperator.contains("Afl"))currentStatus.setAlt(Integer.parseInt(statusValue));
+                    else if(flightOperator.contains("GroundSpeed"))currentStatus.setSpd(Integer.parseInt(statusValue));
+                    else if(flightOperator.contains("Heading"))currentStatus.setHdg(Integer.parseInt(statusValue));
+                    
                     System.out.print(flightOperator + ": " + statusValue + "; ");
                     trafficStatus.add(flightOperator + ": " + statusValue);
                 }
