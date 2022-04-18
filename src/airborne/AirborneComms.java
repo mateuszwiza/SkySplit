@@ -32,7 +32,7 @@ public class AirborneComms {
                 //flightID = Integer.parseInt(strings[0]);
                 flightID = 4996;
                 translator = new AirborneTranslator(flightID);
-                System.out.println(flightID);
+                //System.out.println("Flight number: " + flightID);
                 //String fpMessage = "SetMiniPln Flight=" + flightID + " CallSign=AF123KQ Speed=300 Ssr=4732 Dep=LFBO Arr=LFPG";
                 try {
                     //bus.sendMsg(fpMessage);
@@ -87,6 +87,7 @@ public class AirborneComms {
             @Override
             public void receive(IvyClient client, String[] strings) {
                 try {
+                    //System.out.println(translator.acknowledge(strings[1]));
                     bus.sendMsg(translator.acknowledge(strings[1]));
                 } catch (IvyException ex) {
                     Logger.getLogger(AirborneComms.class.getName()).log(Level.SEVERE, null, ex);
@@ -97,7 +98,7 @@ public class AirborneComms {
     }
     
     public void stop(){
-        
+        bus.stop();
     }
     
     public static void main(String[] args) throws IvyException {

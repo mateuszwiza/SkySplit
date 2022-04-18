@@ -40,7 +40,8 @@ public class GroundComms {
                 else if(arrayACK[1].contains("STANDBY"))message = "A response will be delivered shortly.";
                 
                 try {
-                    System.out.println(message);
+                    //System.out.println(message);
+                    //System.out.println();
                     bus.sendMsg(message);
                 }catch (IvyException ex){
                     Logger.getLogger(GroundComms.class.getName()).log(Level.SEVERE, null, ex);
@@ -49,7 +50,7 @@ public class GroundComms {
         });
         
         //      bind APDLC Format
-        bus.bindMsg("^TrackMovedEvent(.*)", new IvyMessageListener() {
+        bus.bindMsg("^TrackMovedEvents(.*)", new IvyMessageListener() {
             // callback
             @Override
             public void receive(IvyClient client, String[] strings) {
@@ -86,11 +87,11 @@ public class GroundComms {
                         currentStatus.setHdg(val);
                     }
                     
-                    System.out.print(flightOperator + ": " + statusValue + "; ");
+                    //System.out.print(flightOperator + ": " + statusValue + "; ");
                     trafficStatus.add(flightOperator + ": " + statusValue);
                 }
                 
-                System.out.println();
+                //System.out.println();
                 
                 try {
                     bus.sendMsg(trafficStatus.toString());
@@ -112,6 +113,10 @@ public class GroundComms {
         } catch (IvyException ex) {
             Logger.getLogger(GroundComms.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public void stop(){
+        bus.stop();
     }
     
     public static void main(String[] args) throws IvyException {

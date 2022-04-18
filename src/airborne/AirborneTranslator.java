@@ -27,14 +27,16 @@ public class AirborneTranslator {
         String rejeu = "";
         if(apdlc[0].contains("20 CLIMB TO")){
             String alt = apdlc[0].split(" ")[3];
-            rejeu = "AircraftLevel Flight=" + Integer.toString(flightID) + "Fl=" + alt;
+            rejeu = "AircraftLevel Flight=" + Integer.toString(flightID) + " Fl=" + alt;
+            
         }else if(apdlc[0].contains("23 DESCEND TO")){
             String alt = apdlc[0].split(" ")[3];
-            rejeu = "AircraftLevel Flight=" + Integer.toString(flightID) + "Fl=" + alt;
+            rejeu = "AircraftLevel Flight=" + Integer.toString(flightID) + " Fl=" + alt;
         }else if(apdlc[0].contains("190 FLY HEADING")){
             String hdg = apdlc[0].split(" ")[3];
-            rejeu = "AircraftHeading Flight=" + Integer.toString(flightID) + "To=" + hdg;
+            rejeu = "AircraftHeading Flight=" + Integer.toString(flightID) + " To=" + hdg;
         }
+        //System.out.println(rejeu);
         return rejeu;
     }
     
