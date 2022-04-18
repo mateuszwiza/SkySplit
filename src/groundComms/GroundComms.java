@@ -21,22 +21,22 @@ import java.util.logging.Logger;
 public class GroundComms {
     
     private Ivy bus;
-    private SelfTrafficStatus currentStatus;
+    private SelfTrafficStatus currentStatus = new SelfTrafficStatus(0,0,0,0,0);
     
     public GroundComms() throws IvyException {
-        bus = new Ivy("A-G-Connection", "GetNewFlight MsgName=NewF", null);
+        bus = new Ivy("A-G-Connection", "Ground Communications", null);
         
         //bind AAR Format
-        bus.bindMsg("^DM(.*)", new IvyMessageListener(){
+        bus.bindMsg("DM(.*)", new IvyMessageListener(){
             @Override
             public void receive(IvyClient ic, String[] strings) {
                 String ack = strings[0];
                 String[] arrayACK = ack.split(" ");
                 String message = "";
                 
-                if(arrayACK[1] == "WILCO")message = "Instruction understood and will be complied with.";
-                else if(arrayACK[1] == "UNABLE")message = "Instruction cannot be complied with.";
-                else if(arrayACK[1] == "STANDBY")message = "A response will be delivered shortly.";
+                if(arrayACK[1].contains("WILCO"))message = "Instruction understood and will be complied with.";
+                else if(arrayACK[1].contains("UNABLE"))message = "Instruction cannot be complied with.";
+                else if(arrayACK[1].contains("STANDBY"))message = "A response will be delivered shortly.";
                 
                 try {
                     System.out.println(message);
@@ -70,9 +70,20 @@ public class GroundComms {
                     String statusValue = arrayReceived[i].substring(arrayReceived[i].indexOf("=") + 1);
                     
                     //example for change in flight current status to be sent to GUI
-                    if(flightOperator.contains("Afl"))currentStatus.setAlt(Integer.parseInt(statusValue));
-                    else if(flightOperator.contains("GroundSpeed"))currentStatus.setSpd(Integer.parseInt(statusValue));
-                    else if(flightOperator.contains("Heading"))currentStatus.setHdg(Integer.parseInt(statusValue));
+                    if(flightOperator.contains("Afl")){
+                        int val = Integer.parseInt(statusValue);
+                        currentStatus.setAlt(val);
+                    }
+                    
+                    else if(flightOperator.contains("GroundSpeed")){
+                        int val = Integer.parseInt(statusValue);
+                        currentStatus.setSpd(val);
+                    }
+                    
+                    else if(flightOperator.contains("Heading")){
+                        int val = Integer.parseInt(statusValue);
+                        currentStatus.setHdg(val);
+                    }
                     
                     System.out.print(flightOperator + ": " + statusValue + "; ");
                     trafficStatus.add(flightOperator + ": " + statusValue);
