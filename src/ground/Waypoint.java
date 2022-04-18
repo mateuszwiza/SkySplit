@@ -8,6 +8,6 @@ package ground;
  *
  * @author vladb
  */
-public class Waypoint {
+public interface Waypoint {
     
 }
