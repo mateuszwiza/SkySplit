@@ -29,12 +29,13 @@ public class AirborneComms {
             // callback
             @Override
             public void receive(IvyClient client, String[] strings) {
-                flightID = Integer.parseInt(strings[0]);
+                //flightID = Integer.parseInt(strings[0]);
+                flightID = 4996;
                 translator = new AirborneTranslator(flightID);
                 System.out.println(flightID);
-                String fpMessage = "SetMiniPln Flight=" + flightID + " CallSign=AF123KQ Speed=300 Ssr=4732 Dep=LFBO Arr=LFPG";
+                //String fpMessage = "SetMiniPln Flight=" + flightID + " CallSign=AF123KQ Speed=300 Ssr=4732 Dep=LFBO Arr=LFPG";
                 try {
-                    bus.sendMsg(fpMessage);
+                    //bus.sendMsg(fpMessage);
                     flight();
                 } catch (IvyException ex) {
                     Logger.getLogger(AirborneComms.class.getName()).log(Level.SEVERE, null, ex);
@@ -66,7 +67,7 @@ public class AirborneComms {
         });
         
         // Listen for APDLC commands
-        bus.bindMsg("^UM(.*) (.*)", 
+        bus.bindMsg("^UM(.*)", 
                 new IvyMessageListener() {
             // callback
             @Override

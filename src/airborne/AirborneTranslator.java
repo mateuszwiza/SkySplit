@@ -16,13 +16,26 @@ public class AirborneTranslator {
     }
     
     public String rejeuToAAR(String[] rejeu){
-        // TO DO
-        return "";
+        String altitude = rejeu[8];
+        String heading = rejeu[10];
+        String aar = "Flight Level: " + altitude + "   |   Heading: " + heading;
+        System.out.println(aar);
+        return aar;
     }
     
     public String apdlcToRejeu(String[] apdlc){
-        // TO DO
-        return "";
+        String rejeu = "";
+        if(apdlc[0].contains("20 CLIMB TO")){
+            String alt = apdlc[0].split(" ")[3];
+            rejeu = "AircraftLevel Flight=" + Integer.toString(flightID) + "Fl=" + alt;
+        }else if(apdlc[0].contains("23 DESCEND TO")){
+            String alt = apdlc[0].split(" ")[3];
+            rejeu = "AircraftLevel Flight=" + Integer.toString(flightID) + "Fl=" + alt;
+        }else if(apdlc[0].contains("190 FLY HEADING")){
+            String hdg = apdlc[0].split(" ")[3];
+            rejeu = "AircraftHeading Flight=" + Integer.toString(flightID) + "To=" + hdg;
+        }
+        return rejeu;
     }
     
     public String acknowledge(String result){
