@@ -34,6 +34,7 @@ public class AirborneComms {
                 flightID = 4996;
                 translator = new AirborneTranslator(flightID);
                 System.out.println("Flight number: " + flightID);
+                System.out.println();
                 //String fpMessage = "SetMiniPln Flight=" + flightID + " CallSign=AF123KQ Speed=300 Ssr=4732 Dep=LFBO Arr=LFPG";
                 try {
                     //bus.sendMsg(fpMessage);

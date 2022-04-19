@@ -24,8 +24,9 @@ public class AirborneTranslator {
     public String rejeuToAAR(String[] rejeu){
         String altitude = rejeu[8];
         String heading = rejeu[10];
-        String aar = "Flight Level: " + altitude + "   |   Heading: " + heading;
-        System.out.println(aar);
+        String speed = rejeu[11];
+        String aar = "AAR FlightLevel: " + altitude + " Heading: " + heading + " GroundSpeed: " + speed;
+        //System.out.println(aar);
         return aar;
     }
     

@@ -22,12 +22,13 @@ import java.util.logging.Logger;
 public class GroundComms {
     
     private Ivy bus;
-    private SelfTrafficStatus currentStatus = new SelfTrafficStatus(0,0,0,0,0);
+    private GroundProcessor processor;
     
-    public GroundComms() throws IvyException {
+    public GroundComms(GroundProcessor processor) throws IvyException {
+        this.processor = processor;
         bus = new Ivy("A-G-Connection", "Ground Communications", null);
         
-        //bind AAR Format
+        //bind APDLC Format
         bus.bindMsg("DM(.*)", new IvyMessageListener(){
             @Override
             public void receive(IvyClient ic, String[] strings) {
@@ -40,8 +41,8 @@ public class GroundComms {
                 else if(arrayACK[1].contains("STANDBY"))message = "A response will be delivered shortly.";
                 
                 try {
-                    //System.out.println(message);
-                    //System.out.println();
+                    System.out.println(message);
+                    System.out.println();
                     bus.sendMsg(message);
                 }catch (IvyException ex){
                     Logger.getLogger(GroundComms.class.getName()).log(Level.SEVERE, null, ex);
@@ -50,11 +51,13 @@ public class GroundComms {
         });
         
         //      bind APDLC Format
-        bus.bindMsg("^TrackMovedEvents(.*)", new IvyMessageListener() {
+        bus.bindMsg("^AAR (.*)", new IvyMessageListener() {
             // callback
             @Override
             public void receive(IvyClient client, String[] strings) {
+                processor.processAAR(strings);
                 
+                /*
                 String textReceived = strings[0];
                 String[] arrayReceived = textReceived.split(" ");
                 List <String> trafficStatus = new ArrayList <String>();
@@ -98,6 +101,7 @@ public class GroundComms {
                 } catch (IvyException ex) {
                     Logger.getLogger(GroundComms.class.getName()).log(Level.SEVERE, null, ex);
                 }
+*/
             }
         });
         
@@ -109,6 +113,8 @@ public class GroundComms {
     
     public void sendToAirborne(String message){
         try {
+            System.out.println();
+            System.out.println(message);
             bus.sendMsg(message);
         } catch (IvyException ex) {
             Logger.getLogger(GroundComms.class.getName()).log(Level.SEVERE, null, ex);
@@ -117,16 +123,5 @@ public class GroundComms {
     
     public void stop(){
         bus.stop();
-    }
-    
-    public static void main(String[] args) throws IvyException {
-        try {
-            new GroundComms();
-        } catch (IvyException ex) {
-            // Print an explicit message in case of IvyException
-            throw new RuntimeException("Ivy bus had a failure. Quitting Ex2_SimpleIvyApplication...");
-        }
-    }
-    
-    
+    }   
 }
