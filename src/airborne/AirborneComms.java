@@ -8,6 +8,7 @@ import fr.dgac.ivy.Ivy;
 import fr.dgac.ivy.IvyClient;
 import fr.dgac.ivy.IvyException;
 import fr.dgac.ivy.IvyMessageListener;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,7 +33,7 @@ public class AirborneComms {
                 //flightID = Integer.parseInt(strings[0]);
                 flightID = 4996;
                 translator = new AirborneTranslator(flightID);
-                //System.out.println("Flight number: " + flightID);
+                System.out.println("Flight number: " + flightID);
                 //String fpMessage = "SetMiniPln Flight=" + flightID + " CallSign=AF123KQ Speed=300 Ssr=4732 Dep=LFBO Arr=LFPG";
                 try {
                     //bus.sendMsg(fpMessage);
@@ -67,7 +68,21 @@ public class AirborneComms {
         });
         
         // Listen for APDLC commands
-        bus.bindMsg("^UM(.*)", 
+        bus.bindMsg("^UM(\\d*) (.*) (\\d*)", 
+                new IvyMessageListener() {
+            // callback
+            @Override
+            public void receive(IvyClient client, String[] strings) {
+                try {
+                    bus.sendMsg(translator.apdlcToRejeu(strings));
+                } catch (IvyException ex) {
+                    Logger.getLogger(AirborneComms.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+       
+        // Listen for APDLC route commands
+        bus.bindMsg("^UM(\\d*) PROCEED (.*)", 
                 new IvyMessageListener() {
             // callback
             @Override
